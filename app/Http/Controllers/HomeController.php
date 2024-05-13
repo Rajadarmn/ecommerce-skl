@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Event;
+use Illuminate\Http\Request;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        $events = $this->fetchEvent();
+        $categories = $this->fetchCategory();
+        dd($categories);
+        return view('frontend.index');
+    }
+
+    // fetch data event
+    private function fetchEvent(){
+        $category = request()->query('category');
+        $event = Event::upcoming();
+       
+
+        //limit event 6
+        if(request()->query('all-events')){
+            $event->limit(6);
+        }
+
+        if($category){
+            $event->withCategory($category);
+        }
+        return $event->get();
+    }
+
+
+    //fetch data category
+
+    private function fetchCategory(){
+        $categories = Event::sortByMostEvents();
+
+         //limit category 4
+         if(request()->query('all-categories')){
+             $categories->limit(4);
+        }
+       return $categories->get();
+    }
+
+}
